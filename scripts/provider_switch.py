@@ -412,7 +412,22 @@ def upsert_custom_provider(cfg: dict, name: str, base_url: str, key_env: str,
         cfg["custom_providers"] = entries
 
     for entry in entries:
+        # Case-insensitive match (#2026-08-29): a same-name-different-case
+        # entry (e.g. existing "gorouter" vs a switch writing "Gorouter")
+        # must UPDATE the existing entry, not add a case-variant duplicate.
+        # An exact-case match wins first so the entry's stored casing is
+        # only changed when no exact match exists.
         if isinstance(entry, dict) and entry.get("name") == name:
+            entry["base_url"] = base_url
+            entry["key_env"] = key_env
+            entry["model"] = model
+            if payload_models:
+                entry["models"] = payload_models
+                entry["models_discovered"] = True
+            return "updated"
+    for entry in entries:
+        if isinstance(entry, dict) and _norm(entry.get("name")) == _norm(name):
+            entry["name"] = name
             entry["base_url"] = base_url
             entry["key_env"] = key_env
             entry["model"] = model
@@ -660,6 +675,21 @@ def cmd_status(args) -> int:
             print(f"   fallback    : {summary.get('fallback_model')} @ "
                   f"{summary.get('fallback_provider')}")
         print(f"   providers   : {', '.join(summary.get('custom_providers') or []) or '(none)'}")
+        # Case-insensitive duplicate detection (#2026-08-29): "gorouter" and
+        # "Gorouter" look like two providers but resolve to the same
+        # custom:<name> identity down two different case paths — the exact
+        # confusion that caused a real-world mis-switch. Surface it loudly;
+        # don't let it hide silently in the provider list above.
+        _seen: dict[str, list[str]] = {}
+        for _pname in (summary.get("custom_providers") or []):
+            _seen.setdefault(_norm(_pname), []).append(_pname)
+        _dupe_groups = [names for names in _seen.values() if len(names) > 1]
+        if _dupe_groups:
+            for names in _dupe_groups:
+                print(f"   \u26a0\ufe0f  DUPLICATE (case-insensitive): "
+                      f"{' / '.join(names)} — these collide as the same "
+                      f"provider identity. Run `switch` on either name to "
+                      f"merge them; do not treat them as separate providers.")
         print(f"   sessions    : {len(sessions)}  (unroutable: {orphans})")
         if buckets:
             rows = [[p, str(c)] for p, c in sorted(buckets.items(), key=lambda x: -x[1])]
