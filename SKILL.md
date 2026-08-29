@@ -152,9 +152,13 @@ leaves two variables holding the same secret:
   config membership, not liveness — an exhausted provider still shows as
   routable. Use `test` for liveness.
 - **The session you are chatting in right now holds its model in memory.**
-  Pass its id to `--skip-session` and switch it with `/model <name>` typed
-  inside that chat, or just reopen it afterwards. Closed sessions pick up the
-  new route with **no restart needed** (verified).
+  Closed sessions pick up the new route with **no restart needed** (verified).
+  For the LIVE session, rewriting its DB row is not enough: `/model <name>`
+  typed inside the chat may still not take effect, and in practice a full
+  **app restart was required** (verified 2026-08-29). So: run the switch
+  WITHOUT `--skip-session` (so the live row is rewritten too), then tell the
+  user to restart the desktop app. Do not claim the live session switched
+  until they confirm.
 - **Bot profiles pin the provider in their own config**, so they must be
   rewritten too or the next cron fires on a dead endpoint. The script handles
   every discovered profile; never hardcode how many there are.
