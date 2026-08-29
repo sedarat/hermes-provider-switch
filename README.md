@@ -19,6 +19,16 @@ This tool fixes all of it in one pass.
 
 ## Install
 
+**As a Hermes skill (recommended)** — one command, and the agent can then run it for you:
+
+```bash
+hermes skills install https://raw.githubusercontent.com/sedarat/hermes-provider-switch/master/SKILL.md
+```
+
+Or just hand your agent the repo link and say "install this skill".
+
+**Standalone (script only):**
+
 ```bash
 pip install "ruamel.yaml==0.18.6"   # optional but recommended (preserves config comments)
 git clone https://github.com/sedarat/hermes-provider-switch.git
