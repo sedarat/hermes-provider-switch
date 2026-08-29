@@ -1,0 +1,15 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+
+# Hermes runtime artifacts (never publish)
+.env
+*.db
+*.db-wal
+*.db-shm
+*.bak
+provider-switch-backups/
+*.rollback.json
