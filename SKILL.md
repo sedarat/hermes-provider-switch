@@ -11,8 +11,8 @@ main profile, every bot profile, and every historical session row in every
 
 Triggers: "switch to provider X", "new API key, move everything over",
 "this provider died, fix all my sessions", "go back to the old provider",
-"which provider is each profile on?", Persian equivalents such as
-«سویچ کن روی ...», «پروایدر جدید», «همه سشن‌ها رو عوض کن».
+"which provider is each profile on?", and the equivalent requests in any
+other language.
 
 ## Why this exists
 
@@ -151,14 +151,14 @@ leaves two variables holding the same secret:
 - **A provider present in config is not necessarily alive.** `status` reports
   config membership, not liveness — an exhausted provider still shows as
   routable. Use `test` for liveness.
-- **The session you are chatting in right now holds its model in memory.**
+- **The live session holds its model in memory.**
   Closed sessions pick up the new route with **no restart needed** (verified).
-  For the LIVE session, rewriting its DB row is not enough: `/model <name>`
-  typed inside the chat may still not take effect, and in practice a full
-  **app restart was required** (verified 2026-08-29). So: run the switch
-  WITHOUT `--skip-session` (so the live row is rewritten too), then tell the
-  user to restart the desktop app. Do not claim the live session switched
-  until they confirm.
+  For the session that is currently open, rewriting its DB row is not enough:
+  a `/model <name>` command inside that chat may still not take effect, and in
+  practice a full **app restart was required** (verified 2026-08-29). So: run
+  the switch WITHOUT `--skip-session` (so the live row is rewritten too), and
+  the desktop app then needs a restart. The live session should not be
+  reported as switched until the user confirms it.
 - **Bot profiles pin the provider in their own config**, so they must be
   rewritten too or the next cron fires on a dead endpoint. The script handles
   every discovered profile; never hardcode how many there are.

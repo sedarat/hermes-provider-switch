@@ -73,7 +73,11 @@ except Exception:  # pragma: no cover
     _pyyaml = None
 
 if _YAML_RT is None and _pyyaml is None:
-    sys.exit("neither ruamel.yaml nor pyyaml is installed — pip install ruamel.yaml")
+    sys.exit(
+        "No YAML library available. This script needs either ruamel.yaml "
+        "(preferred, preserves comments) or pyyaml. Install one with your "
+        "usual package manager, pinning a version, before running again."
+    )
 
 BACKUP_ROOT_NAME = "provider-switch-backups"
 MANIFEST_NAME = "manifest.json"
@@ -916,7 +920,7 @@ def main(argv: list[str] | None = None) -> int:
     p.add_argument("--api-key", required=True)
     p.add_argument("--model")
     p.add_argument("--timeout", type=int, default=45)
-    p.add_argument("--proxy", help="e.g. socks5h://127.0.0.1:10808")
+    p.add_argument("--proxy", help="optional outbound proxy URL for the probe")
     p.add_argument("--no-chat", action="store_true", help="only probe /models")
     p.set_defaults(func=cmd_test)
 

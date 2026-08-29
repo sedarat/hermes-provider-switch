@@ -20,7 +20,7 @@ This tool fixes all of it in one pass.
 ## Install
 
 ```bash
-pip install ruamel.yaml   # optional but recommended (preserves config comments)
+pip install "ruamel.yaml==0.18.6"   # optional but recommended (preserves config comments)
 git clone https://github.com/sedarat/hermes-provider-switch.git
 ```
 
@@ -61,7 +61,7 @@ python scripts/provider_switch.py rollback --yes
 - **Credentials are verified before anything is written.** A bad key aborts the switch with nothing changed (exit code 2).
 - **Every file is backed up** into `$HERMES_HOME/provider-switch-backups/<stamp>/` with a manifest, and `rollback` restores them.
 - **Removal always runs last**, so a failed switch never leaves you with neither provider.
-- The session you are chatting in right now holds its model in memory — pass its id to `--skip-session` and use `/model` inside that chat. Closed sessions pick up the new route with no restart needed.
+- The live session holds its model in memory — pass its id to `--skip-session` and use the `/model` command inside that chat. Closed sessions pick up the new route with no restart needed.
 
 ## Notes
 
